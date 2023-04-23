@@ -1,13 +1,9 @@
----
-
-COMMENT TO REMOVE
-
-Be aware of XXX in sentences and links: they should be replaced by the actual repository name or the appropriate information..
-
----
 # Contributing <!-- omit in toc -->
 
-First of all, thank you for contributing to MeiliSearch! The goal of this document is to provide everything you need to know in order to contribute to XXX.
+First of all, thank you for contributing to Meilisearch! The goal of this document is to provide everything you need to know in order to contribute to meilisearch-flutter.
+
+
+:warning: :warning: :warning: **This guide is still a work in progress.** :warning: :warning: :warning: 
 
 <details open="open">
 <summary>Table of Contents</summary>
@@ -25,7 +21,7 @@ First of all, thank you for contributing to MeiliSearch! The goal of this docume
 ## Learn more
 
 The following resources may interest you:
-- MeiliSearch [documentation](https://docs.meilisearch.com) 
+- Meilisearch [documentation](https://docs.meilisearch.com) 
 
 [⬆️ Back to top](#table-of-contents)
 
@@ -37,9 +33,9 @@ The following resources may interest you:
 
 Feel free to contact us about any questions you may have:
 
-  - Join our [Slack community](https://slack.meilisearch.com/).
-  - Open an [issue](https://github.com/meilisearch/XXX/issues)!
-  - Open a new [discussion](https://github.com/meilisearch/XXX/discussions) or join one! 
+  - Join our [Discord community](https://discord.meilisearch.com/).
+  - Open an [issue](https://github.com/meilisearch/meilisearch-flutter/issues)!
+  - Open a new [discussion](https://github.com/meilisearch/meilisearch-flutter/discussions) or join one! 
 
 Any suggestion or feedback is highly appreciated. Thank you for your support!
 

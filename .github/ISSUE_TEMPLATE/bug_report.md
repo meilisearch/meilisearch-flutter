@@ -21,10 +21,9 @@ What happened.
 If applicable, add screenshots or logs to help explain your problem.
 
 **Environment (please complete the following information if applicable):**
-- OS: [e.g. Debian GNU/Linux]
-- Meilisearch server version: [e.g. v.0.20.0]
+- OS: [e.g. Android/iOS]
+- Meilisearch server version: [e.g. v0.20.0]
 - SDK version: [e.g v0.1.0]
-- Browser: [e.g. Chrome version 90.0]
 
 **Additional context**
 Additional information that may be relevant to the issue.

@@ -1,70 +1,86 @@
-# Template repository
+<p align="center">
+  <img src="https://raw.githubusercontent.com/meilisearch/integration-guides/main/assets/logos/meilisearch_dart.svg" alt="Meilisearch" width="200" height="200" />
+</p>
 
-## Description 
+<h1 align="center">[WIP] Meilisearch Flutter</h1>
 
-In this repo you'll find the basic files all MeiliSearch repositories should contain at the root directory. Note that these templates are very generic, please modify them according to the particularities and requirements of your project.
+<h4 align="center">
+  <a href="https://github.com/meilisearch/meilisearch">Meilisearch</a> |
+  <a href="https://docs.meilisearch.com">Documentation</a> |
+  <a href="https://discord.meilisearch.com">Discord</a> |
+  <a href="https://roadmap.meilisearch.com/tabs/1-under-consideration">Roadmap</a> |
+  <a href="https://www.meilisearch.com">Website</a> |
+  <a href="https://www.meilisearch.com/docs/faq">FAQ</a>
+</h4>
 
-## Which files require modifications? 
-- Open source license: the year should be changed
-- README: changes required
-- Contributing guidelines: changes required
-- Pull request template: may require changes
-- Issue templates: may require changes
-- Code of conduct : no changes required
-- Security policy: no changes required
+<p align="center">
+  <a href="https://pub.dev/packages/meilisearch"><img src="https://img.shields.io/pub/v/meilisearch_ui" alt="Pub Version"></a>
+  <a href="https://github.com/meilisearch/meilisearch-flutter/actions"><img src="https://github.com/meilisearch/meilisearch-flutter/workflows/Tests/badge.svg" alt="GitHub Workflow Status"></a>
+  <a href="https://github.com/meilisearch/meilisearch-flutter/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational" alt="License"></a>
+  <a href="https://app.bors.tech/repositories/30842"><img src="https://bors.tech/images/badge_small.svg" alt="Bors enabled"></a>
+</p>
 
-| File | Changes required |
-| -------- | :--------: | 
-| Open source license       | 📝    | 
-| README                    | 📝    | 
-| Contributing guidelines   | 📝    | 
-| Pull request template     | 📝    | 
-| Issue templates           | 📝    |
-| Code of conduct           | 🚫    |
-| Security policy           | 🚫    | 
+<p align="center">⚡ The Meilisearch UI kit for Flutter apps</p>
 
+**Meilisearch** is an open-source search engine. [Learn more about Meilisearch.](https://github.com/meilisearch/meilisearch)
 
-## General guidelines
+## Table of Contents <!-- omit in toc -->
 
-### About the README
+- [Description](#description)
+- [Getting started](#getting-started)
+  - [Installation](#installation)
+  - [Usage](#usage)
+- [Contributing](#contributing)
+- [Contact](#contact)
+- [License](#license)
+</details>
 
-In your README, try to answer the following questions:
+## Description
 
-- What does this project do?
-- Why is this project useful?
-- How do I get started?
-- Where can I get more help, if I need it?
-- Link to the contributing guidelines
-- Link to the license
+<!-- Describe your project in brief -->
+<!-- What does this project do? -->
+<!-- Why is this project useful? -->
 
-### About the CONTRIBUTING
+[⬆️ Back to top](#table-of-contents)
 
-Consider adding the following elements to your contributing guidelines:
+## Getting started
 
-- Welcome and thank contributors
-- Table of contents (if your file is long)
-- Prerequisites (if any)
-- Links to important ressources
-- How to contribute (PR protocol...)
-- Where to ask for help
+<!-- Add basic code examples for the most common actions in this section. -->
+TBD, WIP.
 
-### About the issue and PR templates 
+### Installation
+<!-- Include the steps required to install your project -->
+TBD, WIP.
 
-Issue and PR templates are located in the `.github/` directory. 
-Project contributors will automatically see the templates' contents in the issue or the PR body. You can learn more about issue and PR templates in the [GitHub documentation](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository).
+[⬆️ Back to top](#table-of-contents)
 
-## Contributing to this template repository
+### Usage
+<!-- Give the user info on how to use the project. -->
+TBD, WIP.
 
-There's always place for improvement! Please create an issue and / or submit a PR. Any suggestion or feedback is highly appreciated.
+[⬆️ Back to top](#table-of-contents)
 
 
-## Aknowledgements
+## Contributing 
 
-This template is inspired by the following resources:
+Hey, thank you so much for wanting to contribute! Any new contribution is more than welcome in this project! Please read our [contributing guidelines]((https://github.com/meilisearch/meilisearch-flutter/blob/main/CONTRIBUTING.md)) for detailed instructions.
 
-- [Amazing GitHub template](https://github.com/dec0dOS/amazing-github-template)
-- [Awesome README](https://github.com/navendu-pottekkat/awesome-readme)
-- [How to Write a Good README File for Your GitHub Project](https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/)
-- [How To Write a Great README](https://thoughtbot.com/blog/how-to-write-a-great-readme)
-- [Starting an Open Source Project](https://opensource.guide/starting-a-project)
+[⬆️ Back to top](#table-of-contents)
 
+## Contact 
+
+Feel free to contact us about any questions you may have:
+
+  - Join our [Discord community](https://discord.meilisearch.com/).
+  - Open an [issue](https://github.com/meilisearch/meilisearch-flutter/issues)!
+  - Open a new [discussion](https://github.com/meilisearch/meilisearch-flutter/discussions) or join one! 
+
+Any suggestion or feedback is highly appreciated. Thank you for your support!
+
+[⬆️ Back to top](#table-of-contents)
+
+## License
+
+[MIT](https://github.com/meilisearch/meilisearch-flutter/blob/main/LICENSE)
+
+[⬆️ Back to top](#table-of-contents)

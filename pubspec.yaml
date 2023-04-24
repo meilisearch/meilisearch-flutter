@@ -11,7 +11,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  meilisearch: ^0.10.2
+dependency_overrides: 
+  meilisearch:
+    git:
+      url: git@github.com:meilisearch/meilisearch-dart.git
+      ref: main
 dev_dependencies:
   flutter_test:
     sdk: flutter

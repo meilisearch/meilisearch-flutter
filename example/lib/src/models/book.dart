@@ -21,7 +21,7 @@ class Book {
   }
 
   @override
-  String toString() {    
+  String toString() {
     return title;
   }
 }

@@ -91,6 +91,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  infinite_scroll_pagination:
+    dependency: transitive
+    description:
+      name: infinite_scroll_pagination
+      sha256: "9517328f4e373f08f57dbb11c5aac5b05554142024d6b60c903f3b73476d52db"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
   js:
     dependency: transitive
     description:
@@ -127,10 +135,10 @@ packages:
     dependency: "direct main"
     description:
       name: meilisearch
-      sha256: "29fe62c4e8177f3728101c2d12b739fc9348b4dff8daf029a7bd859f1d351ff8"
+      sha256: d3f9789eaa00e5c0a7fa575e83cd3b31bc5b6f72db4a36a9aa3edaa58358442e
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.0"
+    version: "0.13.0"
   meilisearch_ui:
     dependency: "direct main"
     description:
@@ -167,6 +175,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  sliver_tools:
+    dependency: transitive
+    description:
+      name: sliver_tools
+      sha256: ccdc502098a8bfa07b3ec582c282620031481300035584e1bb3aca296a505e8c
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.10"
   source_span:
     dependency: transitive
     description:

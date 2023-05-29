@@ -15,8 +15,10 @@ class DefaultMeilisearchItemWidget<T> extends StatelessWidget {
     this.preTag,
     this.postTag,
     this.highlightedStyle,
+    this.onTap,
   });
   final MeilisearchResultContainer<T> item;
+  final VoidCallback? onTap;
   final String Function(T item)? itemToString;
   final String? displayAttribute;
   final TextStyle? highlightedStyle;
@@ -33,6 +35,7 @@ class DefaultMeilisearchItemWidget<T> extends StatelessWidget {
         ? itemToString?.call(item.parsed) ?? item.parsed.toString()
         : item.formatted?[displayAttribute] ?? item.src[displayAttribute];
     return ListTile(
+      onTap: onTap,
       title: postTag == null || preTag == null
           ? Text(itemString)
           : Text.rich(textSpanFromHighligtableString(
@@ -201,7 +204,7 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
         debugPrint(
             'Items from builder: ${items.length}, ${items.map((e) => e.parsed).join(',')}');
         return SearchAnchor(
-          key: ValueKey(state),
+          key: UniqueKey(),
           searchController: _searchController,
           builder: (context, controller) {
             return SearchBar(
@@ -240,6 +243,7 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
             );
           },
           suggestionsBuilder: (context, controller) {
+            debugPrint("suggestionsBuilder called! ${controller.text}");
             return items.map(
               (e) =>
                   widget.itemBuilder?.call(context, e) ??
@@ -250,6 +254,12 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
                     itemToString: widget.itemToString,
                     postTag: e.fromQuery.highlightPostTag,
                     preTag: e.fromQuery.highlightPreTag,
+                    onTap: () {
+                      final str = widget.itemToString?.call(e.parsed) ??
+                          e.src[widget.displayAttribute] ??
+                          e.parsed.toString();
+                      controller.closeView(str);
+                    },
                   ),
             );
           },

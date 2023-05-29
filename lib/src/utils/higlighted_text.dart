@@ -44,7 +44,7 @@ TextSpan textSpanFromHighligtableString(
   String? text, {
   String preTag = "<em>",
   String postTag = "</em>",
-  TextStyle? highlightedStyle,
+  TextStyle? highlightedStyle = const TextStyle(fontStyle: FontStyle.italic),
   TextSpan? whenNullOrEmpty,
   TextStyle? normalStyle,
 }) {

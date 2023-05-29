@@ -4,8 +4,8 @@ import 'package:flutter/widgets.dart';
 /// each part has an isHighlighted text
 Iterable<({String text, bool isHighlighted})> parseHighligtableString({
   required String text,
-  required String preTag,
-  required String postTag,
+  String preTag = "<em>",
+  String postTag = "</em>",
 }) sync* {
   assert(preTag != postTag,
       "Pre ($preTag) and post ($postTag) tags can't be the same string");
@@ -42,9 +42,9 @@ Iterable<({String text, bool isHighlighted})> parseHighligtableString({
 // a [highlightedStyle] must be provided
 TextSpan textSpanFromHighligtableString(
   String? text, {
-  required String preTag,
-  required String postTag,
-  required TextStyle highlightedStyle,
+  String preTag = "<em>",
+  String postTag = "</em>",
+  TextStyle? highlightedStyle,
   TextSpan? whenNullOrEmpty,
   TextStyle? normalStyle,
 }) {

@@ -17,11 +17,12 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: FutureBuilder<MeiliSearchIndex>(
+      debugShowCheckedModeBanner: false,
+      home: FutureBuilder<List<MeiliSearchIndex>>(
         future: indexFuture,
         builder: (context, snapshot) => snapshot.hasData
             ? HomePage(
-                index: snapshot.data!,
+                indexes: snapshot.data!,
               )
             : const Center(child: CircularProgressIndicator.adaptive()),
       ),
@@ -32,32 +33,55 @@ class MainApp extends StatelessWidget {
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
-    required this.index,
+    required this.indexes,
   });
-  final MeiliSearchIndex index;
+  final List<MeiliSearchIndex> indexes;
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  MeiliSearchIndex get index => widget.index;
+  final sc = ScrollController();
+  List<MeiliSearchIndex> get indexes => widget.indexes;
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        MeiliSearchBar<Book>(
-          client: client,
-          getQuery: (textFilter) => SearchQuery(
-            query: textFilter,
-            indexUid: index.uid,
-            attributesToHighlight: ['title'],
-            highlightPreTag: '<em>',
-            highlightPostTag: '</em>',
-          ),
-          mapper: (src) => Book.fromJson(src),
-          preloadCount: 5,
+    return MeilisearchOffsetBasedQueryBuilder<Book>(
+      client: client,
+      mapper: Book.fromJson,
+      query: MultiSearchQuery(
+        queries: indexes
+            .map(
+              (index) => IndexSearchQuery(
+                indexUid: index.uid,
+                query: '',
+                limit: 30,
+              ),
+            )
+            .toList(),
+      ),
+      builder: (context, state, fetchMore, refresh) => Scaffold(
+        appBar: AppBar(
+          title: Text("Books (${state.itemCount})"),
+          actions: [
+            IconButton(onPressed: refresh, icon: const Icon(Icons.refresh)),
+            IconButton(onPressed: fetchMore, icon: const Icon(Icons.more)),
+          ],
         ),
-      ],
+        body: ListView.builder(
+          controller: sc,
+          itemCount: state.itemCount,
+          itemBuilder: (context, index) {
+            // if (index + 1 >= state.itemCount) {
+            //   fetchMore();
+            // }
+            final item = state.aggregatedResult[index];
+            return ListTile(
+              title: Text('[$index] ${item.parsed.title}'),
+              subtitle: Text('id: ${item.parsed.id}'),
+            );
+          },
+        ),
+      ),
     );
   }
 }

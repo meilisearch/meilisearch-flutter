@@ -61,7 +61,7 @@ class MeiliSearchBar<T> extends StatefulWidget {
     required this.mapper,
     required this.client,
     this.itemToString,
-    required SearchQuery Function(String textFilter) getQuery,
+    required IndexSearchQuery Function(String textFilter) getQuery,
     this.barHintText,
     this.searchController,
     this.debounce = const Duration(milliseconds: 500),
@@ -195,76 +195,84 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return MeilisearchOffsetBasedQueryBuilder<T>(
-      queryStream: queryStream.whereNotNull(),
-      client: widget.client,
-      mapper: widget.mapper,
-      builder: (context, state, fetchMore, refresh) {
-        final items = state.aggregatedResult;
-        debugPrint(
-            'Items from builder: ${items.length}, ${items.map((e) => e.parsed).join(',')}');
-        return SearchAnchor(
-          key: UniqueKey(),
-          searchController: _searchController,
-          builder: (context, controller) {
-            return SearchBar(
-              controller: controller,
-              onTap: () {
-                controller.openView();
-              },
-              onChanged: (_) {
-                controller.openView();
-              },
-              padding: const MaterialStatePropertyAll<EdgeInsets>(
-                  EdgeInsets.symmetric(horizontal: 16.0)),
-              leading: const Icon(Icons.search),
-              trailing: [
-                IconButton(
-                  onPressed: refresh,
-                  icon: const Icon(Icons.refresh),
-                ),
-              ],
-            );
-          },
-          viewBuilder: (suggestions) {
-            final widgetList = suggestions.toList();
-            final preloadCount = widget.preloadCount ?? 5;
-
-            return ListView.builder(
-              itemCount: widgetList.length,
-              itemBuilder: (context, index) {
-                //reached end of the list
-                if (index + preloadCount >= widgetList.length) {
-                  //it's safe to call this here, even when there are multiple builds
-                  fetchMore();
-                }
-                return widgetList[index];
-              },
-            );
-          },
-          suggestionsBuilder: (context, controller) {
-            debugPrint("suggestionsBuilder called! ${controller.text}");
-            return items.map(
-              (e) =>
-                  widget.itemBuilder?.call(context, e) ??
-                  DefaultMeilisearchItemWidget(
-                    key: ValueKey(e),
-                    item: e,
-                    displayAttribute: widget.displayAttribute,
-                    itemToString: widget.itemToString,
-                    postTag: e.fromQuery.highlightPostTag,
-                    preTag: e.fromQuery.highlightPreTag,
+    return StreamBuilder<MultiSearchQuery>(
+        stream: queryStream.whereNotNull(),
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          if (data == null) {
+            return const SizedBox.shrink();
+          }
+          return MeilisearchOffsetBasedQueryBuilder<T>(
+            query: data,
+            client: widget.client,
+            mapper: widget.mapper,
+            builder: (context, state, fetchMore, refresh) {
+              final items = state.aggregatedResult;
+              debugPrint(
+                  'Items from builder: ${items.length}, ${items.map((e) => e.parsed).join(',')}');
+              return SearchAnchor(
+                key: UniqueKey(),
+                searchController: _searchController,
+                builder: (context, controller) {
+                  return SearchBar(
+                    controller: controller,
                     onTap: () {
-                      final str = widget.itemToString?.call(e.parsed) ??
-                          e.src[widget.displayAttribute] ??
-                          e.parsed.toString();
-                      controller.closeView(str);
+                      controller.openView();
                     },
-                  ),
-            );
-          },
-        );
-      },
-    );
+                    onChanged: (_) {
+                      controller.openView();
+                    },
+                    padding: const MaterialStatePropertyAll<EdgeInsets>(
+                        EdgeInsets.symmetric(horizontal: 16.0)),
+                    leading: const Icon(Icons.search),
+                    trailing: [
+                      IconButton(
+                        onPressed: refresh,
+                        icon: const Icon(Icons.refresh),
+                      ),
+                    ],
+                  );
+                },
+                viewBuilder: (suggestions) {
+                  final widgetList = suggestions.toList();
+                  final preloadCount = widget.preloadCount ?? 5;
+
+                  return ListView.builder(
+                    itemCount: widgetList.length,
+                    itemBuilder: (context, index) {
+                      //reached end of the list
+                      if (index + preloadCount >= widgetList.length) {
+                        //it's safe to call this here, even when there are multiple builds
+                        fetchMore();
+                      }
+                      return widgetList[index];
+                    },
+                  );
+                },
+                suggestionsBuilder: (context, controller) async {
+                  debugPrint("suggestionsBuilder called! ${controller.text}");
+                  return items.map(
+                    (e) =>
+                        widget.itemBuilder?.call(context, e) ??
+                        DefaultMeilisearchItemWidget(
+                          key: ValueKey(e),
+                          item: e,
+                          displayAttribute: widget.displayAttribute,
+                          itemToString: widget.itemToString,
+                          postTag: e.fromQuery.highlightPostTag,
+                          preTag: e.fromQuery.highlightPreTag,
+                          onTap: () {
+                            final str = widget.itemToString?.call(e.parsed) ??
+                                e.src[widget.displayAttribute] ??
+                                e.parsed.toString();
+                            controller.closeView(str);
+                          },
+                        ),
+                  );
+                },
+              );
+            },
+          );
+        });
   }
 }

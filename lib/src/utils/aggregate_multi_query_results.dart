@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:meilisearch/meilisearch.dart';
+import 'package:meilisearch_ui/meilisearch_ui.dart';
 
-List<T> bestEffortAggregateSearchResults<T>(
-  List<Searcheable<T>> raw,
+List<MeilisearchResultContainer<T>> bestEffortAggregateSearchResults<T>(
+  List<MeilisearchResultContainer<T>> raw,
 ) {
-  //TODO(ahmednfwela): sort these results based on relevance
-  return raw.map((e) => e.hits).flattened.toList();
+  return raw;
 }

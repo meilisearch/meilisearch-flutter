@@ -1,3 +1,6 @@
+# fvm (flutter version manager)
+# TODO: remove this once this PR lands on stable https://github.com/flutter/flutter/issues/126531
+.fvm/flutter_sdk
 # Miscellaneous
 *.class
 *.log

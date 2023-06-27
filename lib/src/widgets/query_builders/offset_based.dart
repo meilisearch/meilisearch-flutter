@@ -1,64 +1,27 @@
-import 'dart:async';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meilisearch/meilisearch.dart';
-import 'package:rxdart/rxdart.dart';
-
 import 'package:meilisearch_ui/meilisearch_ui.dart';
-import 'package:meilisearch_ui/src/utils/aggregate_multi_query_results.dart';
-
-class MeilisearchOffsetBasedDocumentsState<T> {
-  late final List<MeilisearchResultContainer<T>> aggregatedResult;
-  final List<SearchResult<MeilisearchResultContainer<T>>> rawResults;
-  final bool isLoading;
-
-  /// How many items fetched until now
-  int get globalOffset => rawResults.map((e) => e.offset ?? 0).sum;
-
-  /// How many items are fetched per request
-  int get globalLimit => rawResults.map((e) => e.limit ?? 20).sum;
-
-  /// Query can be null initially
-  final MultiSearchQuery? query;
-  final MeiliSearchClient client;
-
-  MeilisearchOffsetBasedDocumentsState({
-    required this.isLoading,
-    required this.rawResults,
-    required this.query,
-    required this.client,
-  }) : aggregatedResult = bestEffortAggregateSearchResults(rawResults);
-
-  MeilisearchOffsetBasedDocumentsState<T> copyWith({
-    List<SearchResult<MeilisearchResultContainer<T>>>? rawResults,
-    bool? isLoading,
-    MultiSearchQuery? query,
-    MeiliSearchClient? client,
-  }) {
-    return MeilisearchOffsetBasedDocumentsState<T>(
-      rawResults: rawResults ?? this.rawResults,
-      isLoading: isLoading ?? this.isLoading,
-      query: query ?? this.query,
-      client: client ?? this.client,
-    );
-  }
-}
+import 'offset_models.dart';
 
 class MeilisearchOffsetBasedQueryBuilder<T> extends StatefulWidget {
-  const MeilisearchOffsetBasedQueryBuilder({
+  MeilisearchOffsetBasedQueryBuilder({
     super.key,
-    required this.queryStream,
+    required this.query,
     required this.mapper,
     required this.builder,
     required this.client,
-  });
+  })  : assert(query.queries.isNotEmpty, 'Input must have at least one query'),
+        assert(
+          query.queries.none((p0) => p0.page != null || p0.hitsPerPage != null),
+          "An offset-based query shouldn't use page parameters",
+        );
 
   final MeiliSearchClient client;
 
-  /// The multi search query stream to listen to
+  /// The multi search query to execute
   /// Note that this query shouldn't assign offset
-  final Stream<MultiSearchQuery> queryStream;
+  final MultiSearchQuery query;
 
   // Mapper used to convert document to the proper types
   final MeilisearchDocumentMapper<Map<String, dynamic>, T> mapper;
@@ -69,8 +32,8 @@ class MeilisearchOffsetBasedQueryBuilder<T> extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     MeilisearchOffsetBasedDocumentsState<T> state,
-    void Function() fetchMore,
-    void Function() refresh,
+    VoidCallback fetchMore,
+    VoidCallback refresh,
   ) builder;
 
   @override
@@ -80,174 +43,140 @@ class MeilisearchOffsetBasedQueryBuilder<T> extends StatefulWidget {
 
 class _MeilisearchOffsetBasedQueryBuilderState<T>
     extends State<MeilisearchOffsetBasedQueryBuilder<T>> {
-  Stream<MultiSearchQuery>? currentQueryStream;
-  StreamSubscription? currentSub;
+  late MeilisearchOffsetBasedDocumentsState<T> latestState;
 
-  final refreshSignal = BehaviorSubject<bool>.seeded(true);
-  final latestState =
-      BehaviorSubject<MeilisearchOffsetBasedDocumentsState<T>>();
-
-  MultiSearchQuery progressQueryByRespectiveLimit(
-    MultiSearchQuery original,
-    MeilisearchOffsetBasedDocumentsState<T>? latestState,
-  ) {
-    return MultiSearchQuery(
-      queries: original.queries.mapIndexed(
-        //TODO(ahmednfwela): change this after https://github.com/meilisearch/meilisearch-dart/issues/305 is fixed
-        (index, e) {
-          final relatedResult = latestState?.rawResults[index];
-          return SearchQuery(
-            //
-            offset: (relatedResult?.offset ?? 0) + (e.limit ?? 20),
-            // in an offset-based UI, pagination should never be used
-            hitsPerPage: null,
-            page: null,
-            //remove this if copyWith exists
-            query: e.query,
-            indexUid: e.indexUid,
-            attributesToCrop: e.attributesToCrop,
-            attributesToHighlight: e.attributesToHighlight,
-            attributesToRetrieve: e.attributesToRetrieve,
-            cropLength: e.cropLength,
-            cropMarker: e.cropMarker,
-            facets: e.facets,
-            filter: e.filter,
-            filterExpression: e.filterExpression,
-            highlightPostTag: e.highlightPostTag,
-            highlightPreTag: e.highlightPreTag,
-            limit: e.limit,
-            matchingStrategy: e.matchingStrategy,
-            showMatchesPosition: e.showMatchesPosition,
-            sort: e.sort,
-          );
-        },
-      ).toList(),
+  //This makes sure latestState is set to the initial value (0 offset) and loading
+  void setLatestStateInitial() {
+    latestState = MeilisearchOffsetBasedDocumentsState<T>.initial(
+      client: widget.client,
+      multiQuery: widget.query,
     );
-  }
 
-  void initLatestStream() {
-    final currentQueryStream = this.currentQueryStream;
-    if (currentQueryStream == null) {
-      return;
-    }
-    currentSub?.cancel();
-    //from the original query, we should create a new query with the offset set to the latest offset + limit
-    currentSub = Rx.combineLatest2(
-      refreshSignal.stream.where((event) => event).distinct(),
-      currentQueryStream,
-      (a, b) => b,
-    ).switchMap((inputQuery) {
-      assert(
-        inputQuery.queries.none((p0) => p0.offset != null),
-        "The query shouldn't have an offset since the widget automatically assigns it.",
-      );
-      assert(
-        inputQuery.queries
-            .none((p0) => p0.page != null || p0.hitsPerPage != null),
-        "An offset-based query shouldn't use page parameters",
-      );
-      final latestStateValue = latestState.valueOrNull;
-      final newQuery =
-          progressQueryByRespectiveLimit(inputQuery, latestStateValue);
-
-      return widget.client.multiSearch(newQuery).asStream().map(
-            (result) => (
-              newQuery,
-              result,
-            ),
-          );
-    }).map((event) {
-      final (query, result) = event;
-      return MeilisearchOffsetBasedDocumentsState(
-        client: widget.client,
-        //stop loading until the next fetchMore call
-        isLoading: false,
-        query: query,
-        rawResults: result.results.mapIndexed((index, e) {
-          return e.asSearchResult().map(
-            (src) {
-              final item = widget.mapper(src);
-              return MeilisearchResultContainer(
-                src: src,
-                parsed: item,
-                fromQuery: query.queries[index],
-                fromResult: e,
-              );
-            },
-          );
-        }).toList(),
-      );
-    }).listen((event) {
-      refreshSignal.add(false);
-      latestState.add(event);
-    });
+    _requestDataThenSetState();
   }
 
   @override
   void initState() {
     super.initState();
-    currentQueryStream = widget.queryStream;
-    initLatestStream();
+    setLatestStateInitial();
   }
 
   @override
   void didUpdateWidget(
       covariant MeilisearchOffsetBasedQueryBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final newStream = widget.queryStream;
-    if (currentQueryStream != newStream) {
-      currentQueryStream = newStream;
-      initLatestStream();
+
+    if (widget.client != oldWidget.client || widget.query != oldWidget.query) {
+      setLatestStateInitial();
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    currentSub?.cancel();
-  }
+  //Sends the request and sets latestState with the new data
+  void _requestDataThenSetState() async {
+    final toExecute = latestState.rawResults.asMap().entries.toList();
+    //maps the index in rawResults to the index in the improved query
+    final ogMap = Map.fromEntries(
+      toExecute
+          .where((element) => element.value.canHaveMore)
+          .mapIndexed((newIndex, og) => MapEntry(og.key, newIndex)),
+    );
+    //maps the index in the improved query, to its original index in rawResults
+    final inverseMap =
+        Map.fromEntries(ogMap.entries.map((e) => MapEntry(e.value, e.key)));
 
-  void fetchMore(MeilisearchOffsetBasedDocumentsState<T> latest) {
-    // don't fetch more data since it's already loading
-    if (latest.isLoading) {
+    //short circuit to not send any request
+    assert(inverseMap.isNotEmpty);
+
+    final q = MultiSearchQuery(
+      queries: toExecute
+          .where((element) => ogMap.containsKey(element.key))
+          .map((entry) => entry.value.query)
+          .toList(),
+    );
+    final data = await widget.client.multiSearch(q);
+    if (!mounted) {
       return;
     }
-    refreshSignal.add(true);
+
+    final mappedData = toExecute.map((historyEntry) {
+      final ogIndex = historyEntry.key;
+      final history = historyEntry.value;
+      final improvedIndex = ogMap[ogIndex];
+      if (improvedIndex == null) {
+        final latestRealResult = history.resultHistory.lastOrNull;
+        final fakeResult = SearchResult<MeilisearchResultContainer<T>>(
+          indexUid: history.query.indexUid,
+          query: history.query.query,
+          estimatedTotalHits: latestRealResult?.estimatedTotalHits,
+          facetDistribution: latestRealResult?.facetDistribution,
+          facetStats: latestRealResult?.facetStats,
+          hits: [],
+          limit: history.limit,
+          offset: history.latestOffset,
+          matchesPosition: {},
+          processingTimeMs: 0,
+        );
+        return fakeResult;
+      } else {
+        final actualResult = data.results[improvedIndex].asSearchResult();
+        return actualResult.map(
+          (src) => MeilisearchResultContainer<T>(
+            src: src,
+            parsed: widget.mapper(src),
+            fromQuery: q.queries[improvedIndex],
+            fromResult: actualResult,
+          ),
+        );
+      }
+    }).toList();
+
+    setState(() {
+      latestState = latestState.withNewResults(mappedData);
+    });
+  }
+
+  //progress the state by pageSize and then request data
+  void _fetchMore() {
+    // don't fetch more data since it's already loading
+    // or no more data can be fetched
+    if (latestState.isLoading || !latestState.canHaveMore) {
+      return;
+    }
+
+    //set it to loading with the new offsets
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        latestState = latestState.withNewOffsets();
+      });
+      //request the data based on the new query
+      _requestDataThenSetState();
+    });
   }
 
   void refresh() {
-    refreshSignal.add(true);
-    //reset the latest state to a loading state
-    latestState.add(
-      MeilisearchOffsetBasedDocumentsState<T>(
-        isLoading: true,
-        query: null,
-        rawResults: [],
-        client: widget.client,
-      ),
-    );
+    //if it's already loading do nothing
+    if (latestState.isLoading == true) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    //reset latestState to its initial state
+    setState(() {
+      setLatestStateInitial();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<MeilisearchOffsetBasedDocumentsState<T>>(
-      stream: latestState.stream,
-      initialData: MeilisearchOffsetBasedDocumentsState<T>(
-        isLoading: true,
-        query: null,
-        rawResults: [],
-        client: widget.client,
-      ),
-      builder: (context, snapshot) {
-        //snapshot.data will always have a value here since we provided initial data
-        final data = snapshot.data!;
-        return widget.builder(
-          context,
-          data,
-          () => fetchMore(data),
-          refresh,
-        );
-      },
+    return widget.builder(
+      context,
+      latestState,
+      _fetchMore,
+      refresh,
     );
   }
 }

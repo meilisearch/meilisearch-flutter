@@ -71,11 +71,12 @@ class MeilisearchOffsetBasedDocumentsState<T> {
   factory MeilisearchOffsetBasedDocumentsState.initial({
     required MeiliSearchClient client,
     required MultiSearchQuery multiQuery,
+    bool isLoading = true,
   }) {
     final zeroQuery =
         multiQuery.queries.map((e) => e.copyWith(offset: 0)).toList();
     return MeilisearchOffsetBasedDocumentsState(
-      isLoading: true,
+      isLoading: isLoading,
       rawResults: zeroQuery
           .map(
             (e) => PerQuerySearchResults<T>(

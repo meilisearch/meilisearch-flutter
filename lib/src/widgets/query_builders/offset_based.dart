@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meilisearch/meilisearch.dart';
 import 'package:meilisearch_ui/meilisearch_ui.dart';
-import 'offset_models.dart';
 
 class MeilisearchOffsetBasedQueryBuilder<T> extends StatefulWidget {
   MeilisearchOffsetBasedQueryBuilder({
@@ -11,6 +10,8 @@ class MeilisearchOffsetBasedQueryBuilder<T> extends StatefulWidget {
     required this.mapper,
     required this.builder,
     required this.client,
+    this.onStateChanged,
+    this.fetchInitially = true,
   })  : assert(query.queries.isNotEmpty, 'Input must have at least one query'),
         assert(
           query.queries.none((p0) => p0.page != null || p0.hitsPerPage != null),
@@ -36,6 +37,16 @@ class MeilisearchOffsetBasedQueryBuilder<T> extends StatefulWidget {
     VoidCallback refresh,
   ) builder;
 
+  //Gets called everytime the state changes.
+  final void Function(
+    MeilisearchOffsetBasedDocumentsState<T> state,
+    VoidCallback fetchMore,
+    VoidCallback refresh,
+  )? onStateChanged;
+
+  /// if true (the default) will request the first set of items when the widget starts loading
+  final bool fetchInitially;
+
   @override
   State<MeilisearchOffsetBasedQueryBuilder<T>> createState() =>
       _MeilisearchOffsetBasedQueryBuilderState<T>();
@@ -44,21 +55,24 @@ class MeilisearchOffsetBasedQueryBuilder<T> extends StatefulWidget {
 class _MeilisearchOffsetBasedQueryBuilderState<T>
     extends State<MeilisearchOffsetBasedQueryBuilder<T>> {
   late MeilisearchOffsetBasedDocumentsState<T> latestState;
+  void _notifyStateChanged() {
+    widget.onStateChanged?.call(latestState, _fetchMore, refresh);
+  }
 
   //This makes sure latestState is set to the initial value (0 offset) and loading
-  void setLatestStateInitial() {
-    latestState = MeilisearchOffsetBasedDocumentsState<T>.initial(
-      client: widget.client,
-      multiQuery: widget.query,
-    );
-
-    _requestDataThenSetState();
-  }
 
   @override
   void initState() {
     super.initState();
-    setLatestStateInitial();
+    latestState = MeilisearchOffsetBasedDocumentsState<T>.initial(
+      client: widget.client,
+      multiQuery: widget.query,
+      isLoading: widget.fetchInitially,
+    );
+    _notifyStateChanged();
+    if (widget.fetchInitially) {
+      _requestDataThenSetState();
+    }
   }
 
   @override
@@ -67,7 +81,12 @@ class _MeilisearchOffsetBasedQueryBuilderState<T>
     super.didUpdateWidget(oldWidget);
 
     if (widget.client != oldWidget.client || widget.query != oldWidget.query) {
-      setLatestStateInitial();
+      latestState = MeilisearchOffsetBasedDocumentsState<T>.initial(
+        client: widget.client,
+        multiQuery: widget.query,
+      );
+      _notifyStateChanged();
+      _requestDataThenSetState();
     }
   }
 
@@ -133,6 +152,7 @@ class _MeilisearchOffsetBasedQueryBuilderState<T>
     setState(() {
       latestState = latestState.withNewResults(mappedData);
     });
+    _notifyStateChanged();
   }
 
   //progress the state by pageSize and then request data
@@ -151,6 +171,7 @@ class _MeilisearchOffsetBasedQueryBuilderState<T>
       setState(() {
         latestState = latestState.withNewOffsets();
       });
+      _notifyStateChanged();
       //request the data based on the new query
       _requestDataThenSetState();
     });
@@ -164,10 +185,15 @@ class _MeilisearchOffsetBasedQueryBuilderState<T>
     if (!mounted) {
       return;
     }
-    //reset latestState to its initial state
     setState(() {
-      setLatestStateInitial();
+      latestState = MeilisearchOffsetBasedDocumentsState.initial(
+        client: widget.client,
+        multiQuery: widget.query,
+      );
     });
+    //reset latestState to its initial state
+    _notifyStateChanged();
+    _requestDataThenSetState();
   }
 
   @override

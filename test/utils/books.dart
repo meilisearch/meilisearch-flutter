@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:meilisearch/meilisearch.dart';
 
 import 'client.dart';
@@ -22,12 +23,16 @@ final tags = ['t1', 't2', 't3', 't4'];
 
 Future<Map<String, MeiliSearchIndex>> createBooksIndexes({
   String? uid,
+  int baseCount = 10,
 }) async {
   uid ??= randomUid();
   return await Future.wait(
-    _localesBookMap.keys.map(
-      (locale) => createBooksIndex(locale: locale, uid: uid)
-          .then((value) => MapEntry(locale, value)),
+    _localesBookMap.keys.mapIndexed(
+      (index, locale) => createBooksIndex(
+        locale: locale,
+        uid: uid,
+        count: baseCount + index,
+      ).then((value) => MapEntry(locale, value)),
     ),
   ).then((value) => Map.fromEntries(value));
 }
@@ -35,10 +40,11 @@ Future<Map<String, MeiliSearchIndex>> createBooksIndexes({
 Future<MeiliSearchIndex> createBooksIndex({
   String? uid,
   required String locale,
+  required int count,
 }) async {
   final index = client.index((uid ?? randomUid()) + locale);
   final docs = List.generate(
-    100,
+    count,
     (index) => BookDto(
       bookId: index,
       title: '${_localesBookMap[locale]} $index',

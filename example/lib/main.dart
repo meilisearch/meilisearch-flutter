@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   List<MeiliSearchIndex> get indexes => widget.indexes;
   @override
   Widget build(BuildContext context) {
-    return MeilisearchOffsetBasedQueryBuilder<Book>(
+    return MeilisearchOffsetBasedSearchQueryBuilder<Book>(
       client: client,
       mapper: Book.fromJson,
       query: MultiSearchQuery(
@@ -69,11 +69,17 @@ class _HomePageState extends State<HomePage> {
         ),
         body: ListView.builder(
           controller: sc,
-          itemCount: state.itemCount,
+          itemCount: state.itemCount + (state.isLoading ? 1 : 0),
           itemBuilder: (context, index) {
-            // if (index + 1 >= state.itemCount) {
-            //   fetchMore();
-            // }
+            if (index + 1 >= state.itemCount) {
+              fetchMore();
+            }
+            
+            if (state.isLoading && index == state.itemCount) {
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            }
             final item = state.aggregatedResult[index];
             return ListTile(
               title: Text('[$index] ${item.parsed.title}'),

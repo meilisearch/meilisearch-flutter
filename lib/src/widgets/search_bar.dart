@@ -202,7 +202,7 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
           if (data == null) {
             return const SizedBox.shrink();
           }
-          return MeilisearchOffsetBasedQueryBuilder<T>(
+          return MeilisearchOffsetBasedSearchQueryBuilder<T>(
             query: data,
             client: widget.client,
             mapper: widget.mapper,

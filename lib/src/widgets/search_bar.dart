@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:meilisearch/meilisearch.dart';
 import 'package:meilisearch_ui/meilisearch_ui.dart';
-import 'package:meilisearch_ui/src/widgets/query_builders/offset_based.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DefaultMeilisearchItemWidget<T> extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:meilisearch/meilisearch.dart';
 import 'package:meilisearch_ui/meilisearch_ui.dart';
 
@@ -109,19 +110,19 @@ class MeiliPageBasedDocumentsState<T> extends MeiliBuilderStateBase<
     );
   }
 
-  MeiliPageBasedDocumentsState<T> withNewOffsets() {
+  MeiliPageBasedDocumentsState<T> withPage(int page) {
     return copyWith(
       isLoading: true,
       rawResults: rawResults
           .map(
-            (perQueryData) => perQueryData.withPage(),
+            (perQueryData) => perQueryData.withPage(page),
           )
           .toList(),
     );
   }
 
   MeiliPageBasedDocumentsState<T> withNewResults(
-    List<SearchResult<MeilisearchResultContainer<T>>> newResults,
+    List<PaginatedSearchResult<MeilisearchResultContainer<T>>> newResults,
   ) {
     assert(newResults.length == rawResults.length);
 
@@ -144,4 +145,24 @@ class MeiliPageBasedDocumentsState<T> extends MeiliBuilderStateBase<
       client: client ?? this.client,
     );
   }
+}
+
+class MeiliDataTableSource extends DataTableSource {
+  @override
+  DataRow? getRow(int index) {
+    // TODO: implement getRow
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement isRowCountApproximate
+  bool get isRowCountApproximate => throw UnimplementedError();
+
+  @override
+  // TODO: implement rowCount
+  int get rowCount => throw UnimplementedError();
+
+  @override
+  // TODO: implement selectedRowCount
+  int get selectedRowCount => throw UnimplementedError();
 }

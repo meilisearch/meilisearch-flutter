@@ -248,7 +248,7 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
                     },
                   );
                 },
-                suggestionsBuilder: (context, controller) async {
+                suggestionsBuilder: (context, controller) {
                   debugPrint("suggestionsBuilder called! ${controller.text}");
                   return items.map(
                     (e) =>

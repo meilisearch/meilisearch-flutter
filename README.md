@@ -6,6 +6,7 @@
 
 <h4 align="center">
   <a href="https://github.com/meilisearch/meilisearch">Meilisearch</a> |
+  <a href="https://www.meilisearch.com/pricing?utm_campaign=oss&utm_source=integration&utm_medium=meilisearch-flutter">Meilisearch Cloud</a> |
   <a href="https://docs.meilisearch.com">Documentation</a> |
   <a href="https://discord.meilisearch.com">Discord</a> |
   <a href="https://roadmap.meilisearch.com/tabs/1-under-consideration">Roadmap</a> |
@@ -27,6 +28,7 @@
 ## Table of Contents <!-- omit in toc -->
 
 - [Description](#description)
+- [⚡ Supercharge your Meilisearch experience](#-supercharge-your-meilisearch-experience)
 - [Getting started](#getting-started)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -42,6 +44,10 @@
 <!-- Why is this project useful? -->
 
 [⬆️ Back to top](#table-of-contents)
+
+## ⚡ Supercharge your Meilisearch experience
+
+Say goodbye to server deployment and manual updates with [Meilisearch Cloud](https://www.meilisearch.com/pricing?utm_campaign=oss&utm_source=integration&utm_medium=meilisearch-flutter). No credit card required.
 
 ## Getting started
 

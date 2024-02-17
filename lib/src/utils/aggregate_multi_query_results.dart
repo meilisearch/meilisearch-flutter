@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:meilisearch/meilisearch.dart';
-import 'package:meilisearch_ui/meilisearch_ui.dart';
 
-List<MeilisearchResultContainer<T>> bestEffortAggregateSearchResults<T>(
-  List<MeilisearchResultContainer<T>> raw,
+List<MeiliDocumentContainer<T>>
+    bestEffortAggregateSearchResults<T extends Object>(
+  List<MeiliDocumentContainer<T>> raw,
 ) {
-  return raw;
+  return raw.sortedBy<num>((element) => element.rankingScore ?? 0).toList();
 }

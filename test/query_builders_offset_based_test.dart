@@ -39,7 +39,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: MeilisearchOffsetBasedSearchQueryBuilder<BookDto>(
+              body: MeiliSearchOffsetBasedSearchQueryBuilder<BookDto>(
                 onStateChanged: (state, fetchMore, refresh) {
                   _fetchMore = fetchMore;
                   _refresh = refresh;
@@ -127,7 +127,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: MeilisearchOffsetBasedSearchQueryBuilder<BookDto>(
+              body: MeiliSearchOffsetBasedSearchQueryBuilder<BookDto>(
                 onStateChanged: (state, fetchMore, refresh) {
                   _fetchMore = fetchMore;
                   if (states.isClosed) {

@@ -1,8 +1,7 @@
 import 'package:meilisearch/meilisearch.dart';
-import 'package:meilisearch_ui/src/models/result_container.dart';
 
-abstract class MeiliQueryContainerBase<T,
-    TSearchResult extends Searcheable<MeilisearchResultContainer<T>>> {
+abstract class MeiliQueryContainerBase<T extends Object,
+    TSearchResult extends Searcheable<MeiliDocumentContainer<T>>> {
   ///The latest query that was executed, or is getting executed now.
   final IndexSearchQuery query;
 
@@ -19,8 +18,8 @@ abstract class MeiliQueryContainerBase<T,
 }
 
 abstract class MeiliBuilderStateBase<
-    T,
-    TSearchResult extends Searcheable<MeilisearchResultContainer<T>>,
+    T extends Object,
+    TSearchResult extends Searcheable<MeiliDocumentContainer<T>>,
     TContainer extends MeiliQueryContainerBase<T, TSearchResult>> {
   final List<TContainer> rawResults;
   final bool isLoading;

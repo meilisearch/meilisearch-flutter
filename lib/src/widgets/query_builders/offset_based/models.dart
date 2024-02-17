@@ -5,15 +5,16 @@ import 'package:meilisearch_ui/src/utils/aggregate_multi_query_results.dart';
 
 import '../_shared.dart';
 
-class MeiliOffsetBasedQueryContainer<T> extends MeiliQueryContainerBase<T,
-    SearchResult<MeilisearchResultContainer<T>>> {
+class MeiliOffsetBasedQueryContainer<T extends Object>
+    extends MeiliQueryContainerBase<T,
+        SearchResult<MeiliDocumentContainer<T>>> {
   /// The latest offset that was fetched
   int get latestOffset => query.offset ?? 0;
   int? get estimatedTotalHits => resultHistory.lastOrNull?.estimatedTotalHits;
   int get limit => query.limit ?? 20;
 
   ///All the results sorted by offset
-  late final List<MeilisearchResultContainer<T>> accumulatedResults =
+  late final List<MeiliDocumentContainer<T>> accumulatedResults =
       resultHistory.map((e) => e.hits).flattened.toList();
 
   /// true if fetching more items will actually be useful and not return an
@@ -36,7 +37,7 @@ class MeiliOffsetBasedQueryContainer<T> extends MeiliQueryContainerBase<T,
   }
 
   MeiliOffsetBasedQueryContainer<T> withNewResult(
-    SearchResult<MeilisearchResultContainer<T>> newRes,
+    SearchResult<MeiliDocumentContainer<T>> newRes,
   ) {
     return MeiliOffsetBasedQueryContainer(
       query: query,
@@ -45,23 +46,21 @@ class MeiliOffsetBasedQueryContainer<T> extends MeiliQueryContainerBase<T,
   }
 }
 
-class MeiliOffsetBasedDocumentsState<T> extends MeiliBuilderStateBase<
-    T,
-    SearchResult<MeilisearchResultContainer<T>>,
-    MeiliOffsetBasedQueryContainer<T>> {
+class MeiliOffsetBasedDocumentsState<T extends Object>
+    extends MeiliBuilderStateBase<T, SearchResult<MeiliDocumentContainer<T>>,
+        MeiliOffsetBasedQueryContainer<T>> {
   MeiliOffsetBasedDocumentsState._({
     required super.isLoading,
     required super.rawResults,
     required super.client,
   });
 
-  static List<MeilisearchResultContainer<T>> meiliRoundRobinResults<T>(
-    List<
-            MeiliQueryContainerBase<T,
-                SearchResult<MeilisearchResultContainer<T>>>>
+  static List<MeiliDocumentContainer<T>>
+      meiliRoundRobinResults<T extends Object>(
+    List<MeiliQueryContainerBase<T, SearchResult<MeiliDocumentContainer<T>>>>
         rawResults,
   ) {
-    final result = <MeilisearchResultContainer<T>>[];
+    final result = <MeiliDocumentContainer<T>>[];
     final maxHistoryCount = rawResults.isEmpty
         ? 0
         : rawResults.map((e) => e.resultHistory.length).max;
@@ -79,7 +78,7 @@ class MeiliOffsetBasedDocumentsState<T> extends MeiliBuilderStateBase<
     return result;
   }
 
-  late final List<MeilisearchResultContainer<T>> aggregatedResult =
+  late final List<MeiliDocumentContainer<T>> aggregatedResult =
       bestEffortAggregateSearchResults(meiliRoundRobinResults(rawResults));
 
   /// can any of the queries get executed
@@ -122,7 +121,7 @@ class MeiliOffsetBasedDocumentsState<T> extends MeiliBuilderStateBase<
   }
 
   MeiliOffsetBasedDocumentsState<T> withNewResults(
-    List<SearchResult<MeilisearchResultContainer<T>>> newResults,
+    List<SearchResult<MeiliDocumentContainer<T>>> newResults,
   ) {
     assert(newResults.length == rawResults.length);
 

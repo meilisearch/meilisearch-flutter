@@ -5,8 +5,9 @@ import 'package:meilisearch_ui/meilisearch_ui.dart';
 
 import 'models.dart';
 
-class MeilisearchOffsetBasedSearchQueryBuilder<T> extends StatefulWidget {
-  MeilisearchOffsetBasedSearchQueryBuilder({
+class MeiliSearchOffsetBasedSearchQueryBuilder<T extends Object>
+    extends StatefulWidget {
+  MeiliSearchOffsetBasedSearchQueryBuilder({
     super.key,
     required this.query,
     required this.mapper,
@@ -50,12 +51,12 @@ class MeilisearchOffsetBasedSearchQueryBuilder<T> extends StatefulWidget {
   final bool fetchInitially;
 
   @override
-  State<MeilisearchOffsetBasedSearchQueryBuilder<T>> createState() =>
-      _MeilisearchOffsetBasedSearchQueryBuilderState<T>();
+  State<MeiliSearchOffsetBasedSearchQueryBuilder<T>> createState() =>
+      _MeiliSearchOffsetBasedSearchQueryBuilderState<T>();
 }
 
-class _MeilisearchOffsetBasedSearchQueryBuilderState<T>
-    extends State<MeilisearchOffsetBasedSearchQueryBuilder<T>> {
+class _MeiliSearchOffsetBasedSearchQueryBuilderState<T extends Object>
+    extends State<MeiliSearchOffsetBasedSearchQueryBuilder<T>> {
   late MeiliOffsetBasedDocumentsState<T> latestState;
   void _notifyStateChanged() {
     widget.onStateChanged?.call(latestState, _fetchMore, refresh);
@@ -79,7 +80,7 @@ class _MeilisearchOffsetBasedSearchQueryBuilderState<T>
 
   @override
   void didUpdateWidget(
-      covariant MeilisearchOffsetBasedSearchQueryBuilder<T> oldWidget) {
+      covariant MeiliSearchOffsetBasedSearchQueryBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.client != oldWidget.client || widget.query != oldWidget.query) {
@@ -125,7 +126,7 @@ class _MeilisearchOffsetBasedSearchQueryBuilderState<T>
       final improvedIndex = ogMap[ogIndex];
       if (improvedIndex == null) {
         final latestRealResult = history.resultHistory.lastOrNull;
-        final fakeResult = SearchResult<MeilisearchResultContainer<T>>(
+        final fakeResult = SearchResult<MeiliDocumentContainer<T>>(
           indexUid: history.query.indexUid,
           query: history.query.query,
           estimatedTotalHits: latestRealResult?.estimatedTotalHits,
@@ -134,20 +135,16 @@ class _MeilisearchOffsetBasedSearchQueryBuilderState<T>
           hits: [],
           limit: history.limit,
           offset: history.latestOffset,
-          matchesPosition: {},
+          src: {},
+          vector: [],
           processingTimeMs: 0,
         );
         return fakeResult;
       } else {
         final actualResult = data.results[improvedIndex].asSearchResult();
-        return actualResult.map(
-          (src) => MeilisearchResultContainer<T>(
-            src: src,
-            parsed: widget.mapper(src),
-            fromQuery: q.queries[improvedIndex],
-            fromResult: actualResult,
-          ),
-        );
+        return actualResult
+            .mapToContainer()
+            .map((src) => src.map(widget.mapper));
       }
     }).toList();
 

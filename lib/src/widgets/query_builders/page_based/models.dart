@@ -5,8 +5,9 @@ import 'package:meilisearch_ui/meilisearch_ui.dart';
 
 import '../_shared.dart';
 
-class MeiliPageBasedQueryContainer<T> extends MeiliQueryContainerBase<T,
-    PaginatedSearchResult<MeilisearchResultContainer<T>>> {
+class MeiliPageBasedQueryContainer<T extends Object>
+    extends MeiliQueryContainerBase<T,
+        PaginatedSearchResult<MeiliDocumentContainer<T>>> {
   /// The latest offset that was fetched
   int? get totalHits => resultHistory.lastOrNull?.totalHits;
   int? get totalPages => resultHistory.lastOrNull?.totalPages;
@@ -46,7 +47,7 @@ class MeiliPageBasedQueryContainer<T> extends MeiliQueryContainerBase<T,
     return resultMap.containsKey(index);
   }
 
-  MeilisearchResultContainer<T>? getResultAtIndex(int index) {
+  MeiliDocumentContainer<T>? getResultAtIndex(int index) {
     if (!isIndexWithinBounds(index)) {
       return null;
     }
@@ -70,7 +71,7 @@ class MeiliPageBasedQueryContainer<T> extends MeiliQueryContainerBase<T,
   }
 
   MeiliPageBasedQueryContainer<T> withNewResult(
-    PaginatedSearchResult<MeilisearchResultContainer<T>> newRes,
+    PaginatedSearchResult<MeiliDocumentContainer<T>> newRes,
   ) {
     return MeiliPageBasedQueryContainer(
       query: query,
@@ -79,10 +80,11 @@ class MeiliPageBasedQueryContainer<T> extends MeiliQueryContainerBase<T,
   }
 }
 
-class MeiliPageBasedDocumentsState<T> extends MeiliBuilderStateBase<
-    T,
-    PaginatedSearchResult<MeilisearchResultContainer<T>>,
-    MeiliPageBasedQueryContainer<T>> {
+class MeiliPageBasedDocumentsState<T extends Object>
+    extends MeiliBuilderStateBase<
+        T,
+        PaginatedSearchResult<MeiliDocumentContainer<T>>,
+        MeiliPageBasedQueryContainer<T>> {
   MeiliPageBasedDocumentsState._({
     required super.isLoading,
     required super.rawResults,
@@ -122,7 +124,7 @@ class MeiliPageBasedDocumentsState<T> extends MeiliBuilderStateBase<
   }
 
   MeiliPageBasedDocumentsState<T> withNewResults(
-    List<PaginatedSearchResult<MeilisearchResultContainer<T>>> newResults,
+    List<PaginatedSearchResult<MeiliDocumentContainer<T>>> newResults,
   ) {
     assert(newResults.length == rawResults.length);
 

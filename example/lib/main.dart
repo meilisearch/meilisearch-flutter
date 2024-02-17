@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   List<MeiliSearchIndex> get indexes => widget.indexes;
   @override
   Widget build(BuildContext context) {
-    return MeilisearchOffsetBasedSearchQueryBuilder<Book>(
+    return MeiliSearchOffsetBasedSearchQueryBuilder<Book>(
       client: client,
       mapper: Book.fromJson,
       query: MultiSearchQuery(

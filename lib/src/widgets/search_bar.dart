@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meilisearch/meilisearch.dart';
 import 'package:meilisearch_ui/meilisearch_ui.dart';
 import 'package:rxdart/rxdart.dart';
 
-class DefaultMeilisearchItemWidget<T> extends StatelessWidget {
-  const DefaultMeilisearchItemWidget({
+class DefaultMeiliSearchItemWidget<T extends Object> extends StatelessWidget {
+  const DefaultMeiliSearchItemWidget({
     super.key,
     required this.item,
     required this.displayAttribute,
@@ -16,7 +17,7 @@ class DefaultMeilisearchItemWidget<T> extends StatelessWidget {
     this.highlightedStyle,
     this.onTap,
   });
-  final MeilisearchResultContainer<T> item;
+  final MeiliDocumentContainer<T> item;
   final VoidCallback? onTap;
   final String Function(T item)? itemToString;
   final String? displayAttribute;
@@ -54,7 +55,7 @@ class DefaultMeilisearchItemWidget<T> extends StatelessWidget {
 
 // see examples here
 // https://github.com/flutter/flutter/tree/master/examples/api/lib/material/search_anchor
-class MeiliSearchBar<T> extends StatefulWidget {
+class MeiliSearchBar<T extends Object> extends StatefulWidget {
   MeiliSearchBar({
     super.key,
     required this.mapper,
@@ -95,7 +96,7 @@ class MeiliSearchBar<T> extends StatefulWidget {
 
   final Widget Function(
     BuildContext context,
-    MeilisearchResultContainer<T> item,
+    MeiliDocumentContainer<T> item,
   )? itemBuilder;
 
   final int? totalDocumentLimit;
@@ -112,7 +113,7 @@ class MeiliSearchBar<T> extends StatefulWidget {
   State<MeiliSearchBar<T>> createState() => _MeiliSearchBarState<T>();
 }
 
-class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
+class _MeiliSearchBarState<T extends Object> extends State<MeiliSearchBar<T>> {
   final textSubject = BehaviorSubject.seeded('');
   final isSearchControllerOpen = BehaviorSubject.seeded(false);
   final queryStream = BehaviorSubject<MultiSearchQuery?>.seeded(null);
@@ -197,12 +198,12 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
     return StreamBuilder<MultiSearchQuery>(
         stream: queryStream.whereNotNull(),
         builder: (context, snapshot) {
-          final data = snapshot.data;
-          if (data == null) {
+          final query = snapshot.data;
+          if (query == null) {
             return const SizedBox.shrink();
           }
-          return MeilisearchOffsetBasedSearchQueryBuilder<T>(
-            query: data,
+          return MeiliSearchOffsetBasedSearchQueryBuilder<T>(
+            query: query,
             client: widget.client,
             mapper: widget.mapper,
             builder: (context, state, fetchMore, refresh) {
@@ -253,13 +254,21 @@ class _MeiliSearchBarState<T> extends State<MeiliSearchBar<T>> {
                   return items.map(
                     (e) =>
                         widget.itemBuilder?.call(context, e) ??
-                        DefaultMeilisearchItemWidget(
+                        DefaultMeiliSearchItemWidget(
                           key: ValueKey(e),
                           item: e,
                           displayAttribute: widget.displayAttribute,
                           itemToString: widget.itemToString,
-                          postTag: e.fromQuery.highlightPostTag,
-                          preTag: e.fromQuery.highlightPreTag,
+                          postTag: query.queries
+                              .firstWhereOrNull(
+                                (element) => element.highlightPostTag != null,
+                              )
+                              ?.highlightPostTag,
+                          preTag: query.queries
+                              .firstWhereOrNull(
+                                (element) => element.highlightPreTag != null,
+                              )
+                              ?.highlightPreTag,
                           onTap: () {
                             final str = widget.itemToString?.call(e.parsed) ??
                                 e.src[widget.displayAttribute] ??

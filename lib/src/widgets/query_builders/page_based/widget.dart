@@ -127,7 +127,7 @@
 //       final improvedIndex = ogMap[ogIndex];
 //       if (improvedIndex == null) {
 //         final latestRealResult = history.resultHistory.lastOrNull;
-//         final fakeResult = SearchResult<MeilisearchResultContainer<T>>(
+//         final fakeResult = SearchResult<MeiliDocumentContainer<T>>(
 //           indexUid: history.query.indexUid,
 //           query: history.query.query,
 //           estimatedTotalHits: latestRealResult?.estimatedTotalHits,
@@ -143,7 +143,7 @@
 //       } else {
 //         final actualResult = data.results[improvedIndex].asSearchResult();
 //         return actualResult.map(
-//           (src) => MeilisearchResultContainer<T>(
+//           (src) => MeiliDocumentContainer<T>(
 //             src: src,
 //             parsed: widget.mapper(src),
 //             fromQuery: q.queries[improvedIndex],

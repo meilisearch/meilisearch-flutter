@@ -1,6 +1,4 @@
-# fvm (flutter version manager)
-# TODO: remove this once this PR lands on stable https://github.com/flutter/flutter/issues/126531
-.fvm/flutter_sdk
+pubspec.lock
 # Miscellaneous
 *.class
 *.log
@@ -23,13 +21,25 @@ migrate_working_dir/
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 #.vscode/
-android/local.properties
-ios/flutter/
 
 # Flutter/Dart/Pub related
-# Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
-/pubspec.lock
 **/doc/api/
+**/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
 .packages
-build/
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release

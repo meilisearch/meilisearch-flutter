@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meilisearch/meilisearch.dart';
-import 'package:meilisearch_ui/meilisearch_ui.dart';
 
 import '../_shared.dart';
 

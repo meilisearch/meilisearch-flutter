@@ -12,12 +12,12 @@ dependencies:
   collection: ^1.17.1
   flutter:
     sdk: flutter
-  meilisearch: ^0.15.0
+  meilisearch: ^0.16.0
   #TODO: remove rxdart dependency
   rxdart: ^0.27.7
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
-  rxdart: ^0.27.7
+  flutter_lints: ^3.0.2  
+  dio: ^5.4.3+1
 flutter:

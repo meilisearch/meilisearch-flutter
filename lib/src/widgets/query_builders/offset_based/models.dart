@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:meilisearch/meilisearch.dart';
-import 'package:meilisearch_ui/meilisearch_ui.dart';
 import 'package:meilisearch_ui/src/utils/aggregate_multi_query_results.dart';
 
 import '../_shared.dart';
